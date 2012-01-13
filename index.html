@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Control loop</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="js/app.js"></script>
+  </head>
+    <body>
+    <h1>Controll loop... almost</h1>
+    <div id="container">	
+	  <div id="plot1" style="width:600px;height:300px;"></div>
+	  <div id="plot2"></div>
+	  
+	  <div id="indicator">
+	    <ul>
+		  <li>Time: <span class="timeValue">0</span></li>	
+		  <li>SP generator output: <span class="spGenValue">0</span></li>	
+		  <li>Process output: <span class="processValue">0</span></li>
+        </ul>	  
+	  </div>
+	  
+	  <div id="ctrl">
+	    <ul>
+		  <li id="run"><input type="button" value="Run simulation!"></li>
+		  <li id="reset"><input type="button" value="Reset"></li>
+        </ul>		  
+	  </div>
+	  
+	  <div id="params">
+	    <h3>Options</h3>	    
+	  </div>
+	</div>
+  </body>
+</html>
