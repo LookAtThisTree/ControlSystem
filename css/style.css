@@ -1,0 +1,98 @@
+*{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;	
+	font-family: "Verdana", "Helvetica", "Arial", sans-serif;
+	font-size: 12px;
+}
+
+div.mainDiv {
+	color: rgb(0, 0, 0);
+	margin: 5px 5px 5px 5px;
+	display: block;
+	border-collapse: separate;
+}
+
+h1{
+	text-align: center;
+	font-size: 1.6em;
+	padding: 4px 4px 4px 4px;
+}
+
+div.togglable{
+	text-align: center;
+	border-color: rgb(200, 200, 200);
+	border-style: solid;
+	border-width: 2px 2px 2px 2px;
+}
+
+div.togglable h2{
+	background-color: rgb(240, 240, 240);
+	padding: 4px 4px 4px 4px;
+	font-size: 1.2em;
+	display: block;
+}
+
+ul.list{
+	text-align: center;
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+}
+
+ul.list li{
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+	display: block;
+}
+
+ul.sublist {
+	text-align: center;
+}
+
+ul.optionlist {
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+	display: block;
+	margin: 5px 5px 5px 5px;
+	text-align: left;
+}
+
+ul.sublist  li{
+	display: inline-block;
+	margin: 5px 5px 5px 5px;
+}
+
+ul.subsublist {
+	border-color: rgb(221, 221, 221);
+	border-style: solid;
+	border-width: 2px 2px 2px 2px;
+}
+
+ul.subsublist  li{
+	display: block;
+	margin: 5px 5px 5px 5px;
+}
+
+.floatInput{
+	width: 100px;
+	text-align: center;
+}
+
+.buttonInput{
+	width: 200px;
+	text-align: center;
+	padding: 2px 2px 2px 2px;
+}
+
+#plots{
+	text-align: center;
+}
+
+.flotPlot{
+	width: 1000px;
+	height: 200px;
+	margin: 5px 5px 5px 5px;
+}
+

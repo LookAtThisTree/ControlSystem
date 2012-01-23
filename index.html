@@ -1,38 +1,75 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Control loop</title>
-    <link href="css/style.css" rel="stylesheet" type="text/css">
-    <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
-    <script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
-    <script language="javascript" type="text/javascript" src="js/app.js"></script>
-  </head>
-    <body>
-    <h1>Controll loop... almost</h1>
-    <div id="container">	
-	  <div id="plot1" style="width:600px;height:300px;"></div>
-	  <div id="plot2"></div>
-	  
-	  <div id="indicator">
-	    <ul>
-		  <li>Time: <span class="timeValue">0</span></li>	
-		  <li>SP generator output: <span class="spGenValue">0</span></li>	
-		  <li>Process output: <span class="processValue">0</span></li>
-        </ul>	  
-	  </div>
-	  
-	  <div id="ctrl">
-	    <ul>
-		  <li id="run"><input type="button" value="Run simulation!"></li>
-		  <li id="reset"><input type="button" value="Reset"></li>
-        </ul>		  
-	  </div>
-	  
-	  <div id="params">
-	    <h3>Options</h3>	    
-	  </div>
-	</div>
-  </body>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Control loop</title>
+		<link href="css/style.css" rel="stylesheet" type="text/css">
+		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+		<script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script language="javascript" type="text/javascript" src="js/svg/jquery.svg.min.js"></script>
+		<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+		<script language="javascript" type="text/javascript" src="js/app.js"></script>
+	</head>
+	<body>
+		<h1>Control system simulator</h1>
+		<div id="charts" class="mainDiv togglable">
+			<h2>A block diagram of the control system</h2>
+			<div id="chart"></div>
+		</div>
+		<div id="plots" class="mainDiv togglable">
+			<h2>Plots of output signals</h2>
+			<div id="plot1" class="flotPlot"></div>
+			<div id="plot2" class="flotPlot"></div>
+		</div>
+		<div id="options" class="mainDiv togglable">
+			<h2>System options</h2>
+		</div>
+		<div id="ctrl" class="mainDiv">
+			<ul class="list">
+				<li id="executionCtrl">
+					<ul class="sublist">
+						<li><input id="runButton" class="buttonInput" type="button" value="Run simulation!"></li>
+						<li><input id="resetButton" class="buttonInput" type="button" value="Reset"></li>
+					</ul>
+				</li>
+				<li id="simulatorCtrl">
+					<ul class="sublist">
+						<li>
+							<ul class="subsublist">
+								<li>Simulation duration [s]:</li>
+								<li><input id="durationInput" class="floatInput lockable" type="text" value="60"></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subsublist">
+								<li>Sampling interval [s]:</li>
+								<li><input id="intervalInput" class="floatInput lockable" type="text" value="0.1"></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subsublist">
+								<li>Simulation acceleration:</li>
+								<li><input id="boostInput" class="floatInput" type="text" value="1"></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subsublist">
+								<li>Control system type:</li>
+								<li>
+									<select id="systemSelector" class="lockable">									
+									</select>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<p id="sp"></p>
+		<p id="e"></p>
+		<p id="pv"></p>
+		<p id="cv"></p>
+		<p id="u"></p>
+		<p id="z"></p>
+	</body>
 </html>
