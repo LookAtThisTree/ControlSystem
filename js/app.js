@@ -527,12 +527,12 @@ app.tf2ss = function(numerator, denominator){
 	  
 	model.B = zeros.slice();	  
 	model.B[rank-1] = 1;
-	  
-	model.C = app.sum(numerator.slice(0, rank), app.mulS(model.A[rank-1], -1 * numerator[rank]));
+		  
+	model.C = app.sum(numerator.slice(0, rank), app.mulS(model.A[rank-1].slice(), numerator[rank]));
 	  
 	model.D = numerator[rank];
 	  
-	model.state = zeros.slice();	
+	model.state = zeros.slice();
 
 	return model;
 };
@@ -868,9 +868,35 @@ app.ProcessTest = function(spec){
 		}
 	};
 	
+	var sp = 0;
+	var pv = 0;
+	var spLine = [];
+	var pvLine = [];
+	
 	spec.execute = function(time){
-		input = generator.execute(time);
-		process.execute(time, input);
+		sp = generator.execute(time);
+		pv = process.execute(time, sp);
+		
+		var t = time.k * time.tp;
+		
+		if(time.k == 0){
+			spLine = [];
+			pvLine = [];			
+		};
+		
+		spLine.push([t, sp]);
+		pvLine.push([t, pv]);
+						
+		$.plot($("#plot1"), [		
+			{label: 'U', data: spLine} 
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
+		$.plot($("#plot2"), [
+			{label: 'Y', data: pvLine}
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
 	};
 	
 	var that = app.ControlSystem(spec);
@@ -951,10 +977,66 @@ app.OpenLoop = function(spec){
 			to: {col: 3, row: 0, arrow: true}			
 		}		
 	};
+	
+	var sp = 0;
+	var e = 0;
+	var pv = 0;
+	var cv = 0;
+	var u = 0;
+	var z = 0;
+	var spLine = [];
+	var eLine = [];
+	var pvLine = [];
+	var cvLine = [];
+	var uLine = [];
+	var zLine = [];
+	
+	spec.execute = function(time){
+		sp = spec.devices.spGenerator.execute(time);
+		e = sp;
+		cv = spec.devices.controller.execute(time, e);
+		z = spec.devices.distGenerator.execute(time);
+		u = z + cv;
+		pv = spec.devices.process.execute(time, u);
+		
+		var t = time.k * time.tp;
+		
+		if(time.k == 0){
+			spLine = [];
+			eLine = [];
+			cvLine = [];
+			zLine = [];
+			uLine = [];
+			pvLine = [];			
+		};
+		
+		spLine.push([t, sp]);
+		eLine.push([t, e]);
+		cvLine.push([t, cv]);
+		zLine.push([t, z]);
+		uLine.push([t, u]);
+		pvLine.push([t, pv]);
+						
+		$.plot($("#plot1"), [		
+			{label: 'SP', data: spLine}, 
+			{label: 'PV', data: pvLine}, 
+			{label: 'e', data: eLine}
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
+		$.plot($("#plot2"), [
+			{label: 'CV', data: cvLine},
+			{label: 'u', data: uLine}, 
+			{label: 'z', data: zLine}
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
+	};
+	
 	var that = app.ControlSystem(spec);
 	return that;
 };
-//app.ctrl.registerSystem('openLoop', "Open loop system", app.OpenLoop);
+app.ctrl.registerSystem('openLoop', "Open loop system", app.OpenLoop);
 
 app.ClosedLoop = function(spec){	
 	var sp = 0;
@@ -1101,37 +1183,43 @@ app.Cascade = function(spec){
 			name: 'Fast process',
 			col: 2,
 			row: 0,
-			type: 'process'
+			type: 'process',
+			device: app.LinearProcess({})
 		}),
 		slowProcess: app.Manager({
 			name: 'Slow process',
 			col: 4,
 			row: 0,
-			type: 'process'
+			type: 'process',
+			device: app.LinearProcess({})
 		}),
 		fastController: app.Manager({
 			name: 'Fast controller',
 			col: 2,
 			row: 1,
-			type: 'controller'
+			type: 'controller',
+			device: app.PID({})
 		}),
 		slowController: app.Manager({
 			name: 'Slow controller',
 			col: 4,
 			row: 1,
-			type: 'controller'
+			type: 'controller',
+			device: app.PID({})
 		}),
 		spGenerator: app.Manager({
 			name: 'SP generator',
 			col: 6,
 			row: 1,
-			type: 'generator'
+			type: 'generator',
+			device: app.BasicGenerator({})
 		}),
 		distGenerator: app.Manager({
 			name: 'Disturbance',
 			col: 0,
 			row: 0,
-			type: 'generator'
+			type: 'generator',
+			device: app.BasicGenerator({})
 		})
 	};
 	spec.sums = {
@@ -1308,11 +1396,64 @@ app.Cascade = function(spec){
 		}		
 	};
 	
+	var sp = 0;
+	var e = 0;
+	var pvFast = 0;
+	var pvSlow = 0;
+	var cv = 0;
+	var z = 0;
 	
+	var spLine = [];
+	var eLine = [];
+	var pvFastLine = [];
+	var pvSlowLine = [];
+	var zLine = [];
+	
+	spec.execute = function(time){
+		sp = spec.devices.spGenerator.execute(time);
+		e = sp - pvSlow;
+		cv = spec.devices.slowController.execute(time, e);
+		cv = spec.devices.slowController.execute(time, cv - pvFast);
+		
+		z = spec.devices.distGenerator.execute(time);
+		
+		pvFast = spec.devices.fastProcess.execute(time, z + cv);
+		pvSlow = spec.devices.fastProcess.execute(time, pvFast);
+		
+		var t = time.k * time.tp;
+		
+		if(time.k == 0){
+			spLine = [];
+			eLine = [];
+			zLine = [];
+			pvFastLine = [];
+			pvSlowLine = [];			
+		};
+		
+		spLine.push([t, sp]);
+		eLine.push([t, e]);
+		pvFastLine.push([t, pvFast]);
+		pvSlowLine.push([t, pvSlow]);
+						
+		$.plot($("#plot1"), [		
+			{label: 'SP', data: spLine}, 
+			{label: 'PV Slow process', data: pvSlowLine}, 
+			{label: 'PV Fast process', data: pvFastLine}
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
+		$.plot($("#plot2"), [
+			{label: 'e', data: eLine}
+		],{
+			xaxis: {min: 0, max: app.ctrl.getDuration()}
+		});
+	};
+	
+		
 	var that = app.ControlSystem(spec);
 	return that;
 };
-//app.ctrl.registerSystem('cascade', "Cascade control system", app.Cascade);
+app.ctrl.registerSystem('cascade', "Cascade control system", app.Cascade);
 
 app.InputToOutput = function(spec){
 	spec.title = spec.title || 'Input to output';
@@ -1328,11 +1469,21 @@ app.LinearProcess = function(spec){
 	spec.denominator = spec.denominator || app.Variable({
 		value: [5, 1]
 	});
-	var delay = app.Variable({
+	spec.delay = app.Variable({
 		value: 0
 	});
 	
 	var model = {};
+	
+	var inputLine = [];
+	var del = 0;
+	var inputToProcess = 0;
+	var setBuffer = function(tp){
+		del = spec.delay.get() / tp;
+		for(var i = 0; i < del; ++i){
+			inputLine[i] = 0;
+		};
+	};
 
 	spec.parameters = spec.parameters || [
 		app.FloatVectorParameter({
@@ -1345,7 +1496,7 @@ app.LinearProcess = function(spec){
 		}),
 		app.FloatParameter({
 			name: "Delay",
-			variable: delay,
+			variable: spec.delay,
 			min: 0
 		})
 	];	
@@ -1354,13 +1505,32 @@ app.LinearProcess = function(spec){
 	});
 	spec.denominator.attachFunction(function(){
 		model = app.tf2ss(spec.numerator.get(), spec.denominator.get());
-		console.debug(model);
+	});
+	spec.delay.attachFunction(function(){
+		//setBuffer();
 	});
 	model = app.tf2ss(spec.numerator.get(), spec.denominator.get());
+	//setBuffer();
+	
 	
 	spec.execute = spec.execute || function(time, input){
 		var res = app.mulV(model.C, model.state) + model.D * input;
-		model.state = app.solve(input, model, model.state, time.tp);
+		
+		if(time.k === 0){
+			setBuffer(time.tp);
+			model = app.tf2ss(spec.numerator.get(), spec.denominator.get());
+		};
+		
+		if(del === 0){
+			inputToProcess = input;
+		}
+		else{
+			inputToProcess = inputLine[time.k % del];
+			inputLine[time.k % del] = input;
+		};
+				
+		model.state = app.solve(inputToProcess, model, model.state, time.tp);		
+		
 		return res;
 	};
 	
@@ -1371,13 +1541,13 @@ app.ctrl.registerDevice('linearProcess', 'process', "Transfer function", app.Lin
 
 app.PID = function(spec){
 	var kp = app.Variable({
-		value: 1
+		value: 1.2
 	});
 	var Ti = app.Variable({
-		value: 50
+		value: 4
 	});
 	var Td = app.Variable({
-		value: 2
+		value: 0.8
 	});
 	var kd = app.Variable({
 		value: 8
